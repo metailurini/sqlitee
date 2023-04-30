@@ -10,8 +10,8 @@ enum MetaCommandResult {
 }
 
 enum PrepareResult {
-    MetaCommandSuccess,
-    MetaCommandUnrecognizedCommand,
+    MetaPrepareSuccess,
+    MetaPrepareUnrecognizedStatement,
 }
 
 enum StatementType {
@@ -88,26 +88,26 @@ fn do_meta_command(input_buffer: &InputBuffer) -> MetaCommandResult {
 
 fn prepare_statement(input_buffer: &InputBuffer, stm: &mut Statement) -> PrepareResult {
     let inp = match input_buffer.buffer.clone() {
-        None => return PrepareResult::MetaCommandUnrecognizedCommand,
+        None => return PrepareResult::MetaPrepareUnrecognizedStatement,
         Some(inp) => inp.clone(),
     };
     let i = inp.trim();
 
     if i == "select" {
         stm.s_type = StatementType::StatementSelect;
-        return PrepareResult::MetaCommandSuccess;
+        return PrepareResult::MetaPrepareSuccess;
     }
 
     if i == "insert" {
         stm.s_type = StatementType::StatementInsert;
-        return PrepareResult::MetaCommandSuccess;
+        return PrepareResult::MetaPrepareSuccess;
     }
 
     if i == "" {
-        return PrepareResult::MetaCommandSuccess;
+        return PrepareResult::MetaPrepareSuccess;
     }
 
-    return PrepareResult::MetaCommandUnrecognizedCommand;
+    return PrepareResult::MetaPrepareUnrecognizedStatement;
 }
 
 fn execute_statement(stm: &Statement) {
@@ -155,8 +155,8 @@ fn main() {
             s_type: StatementType::StatementNone,
         };
         match prepare_statement(&input_buffer, &mut statement) {
-            PrepareResult::MetaCommandSuccess => {}
-            PrepareResult::MetaCommandUnrecognizedCommand => {
+            PrepareResult::MetaPrepareSuccess => {}
+            PrepareResult::MetaPrepareUnrecognizedStatement => {
                 println!(
                     "Unrecognized keyword at start of '{}'.",
                     input_buffer.buffer.as_ref().unwrap()
